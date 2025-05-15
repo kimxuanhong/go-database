@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strconv"
@@ -16,6 +17,7 @@ type Config struct {
 	Schema   string `yaml:"schema"`
 	SSLMode  string `yaml:"sslmode"`
 	Debug    bool   `yaml:"debug"`
+	Driver   string `yaml:"driver"`
 }
 
 func NewConfig() *Config {
@@ -23,11 +25,12 @@ func NewConfig() *Config {
 		Host:     getEnv("DB_HOST", "localhost"),
 		Port:     getEnv("DB_PORT", "5432"),
 		User:     getEnv("DB_USER", "postgres"),
-		Password: getEnv("DB_PASSWORD", "postgres"),
+		Password: getEnv("DB_PASSWORD", "password"),
 		DBName:   getEnv("DB_NAME", "postgres"),
 		Schema:   getEnv("DB_SCHEMA", "public"),
 		SSLMode:  getEnv("DB_SSL_MODE", "disable"),
 		Debug:    getEnvAsBool("DB_DEBUG_MODE", true),
+		Driver:   getEnv("DRIVER", "postgres"),
 	}
 }
 
@@ -55,4 +58,30 @@ func getEnv(key, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+func GetConfig(configs ...*Config) *Config {
+	if len(configs) > 0 && configs[0] != nil {
+		return configs[0]
+	}
+	viper.SetDefault("database.host", "localhost")
+	viper.SetDefault("database.port", "5432")
+	viper.SetDefault("database.user", "postgres")
+	viper.SetDefault("database.password", "password")
+	viper.SetDefault("database.dbname", "postgres")
+	viper.SetDefault("database.schema", "public")
+	viper.SetDefault("database.sslmode", "disable")
+	viper.SetDefault("database.debug", true)
+	viper.SetDefault("database.driver", "postgres")
+	return &Config{
+		Host:     viper.GetString("database.host"),
+		Port:     viper.GetString("database.port"),
+		User:     viper.GetString("database.user"),
+		Password: viper.GetString("database.password"),
+		DBName:   viper.GetString("database.dbname"),
+		Schema:   viper.GetString("database.schema"),
+		SSLMode:  viper.GetString("database.sslmode"),
+		Debug:    viper.GetBool("database.debug"),
+		Driver:   viper.GetString("database.driver"),
+	}
 }
