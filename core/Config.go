@@ -9,15 +9,15 @@ import (
 )
 
 type Config struct {
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	DBName   string `yaml:"dbname"`
-	Schema   string `yaml:"schema"`
-	SSLMode  string `yaml:"sslmode"`
-	Debug    bool   `yaml:"debug"`
-	Driver   string `yaml:"driver"`
+	Host     string `mapstructure:"host" yaml:"host"`
+	Port     string `mapstructure:"port" yaml:"port"`
+	User     string `mapstructure:"user" yaml:"user"`
+	Password string `mapstructure:"password" yaml:"password"`
+	DBName   string `mapstructure:"dbname" yaml:"dbname"`
+	Schema   string `mapstructure:"schema" yaml:"schema"`
+	SSLMode  string `mapstructure:"sslmode" yaml:"sslmode"`
+	Debug    bool   `mapstructure:"debug" yaml:"debug"`
+	Driver   string `mapstructure:"driver" yaml:"driver"`
 }
 
 func NewConfig() *Config {
