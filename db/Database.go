@@ -13,23 +13,33 @@ type Database struct {
 	*gorm.DB
 }
 
-// Connection initializes and returns a new Database instance.
-func Connection(configs ...*Config) (*Database, error) {
-	cfg := GetConfig(configs...)
-	switch cfg.Driver {
-	case "mysql":
-		return Open(postgres.Open(cfg.GetDSN()), cfg)
+func BuildDSN(c *Config) (gorm.Dialector, error) {
+	switch c.Driver {
 	case "postgres":
-		return Open(mysql.Open(cfg.GetDSN()), cfg)
+		dsn := fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s search_path=%s sslmode=%s",
+			c.Host, c.Port, c.User, c.Password, c.DBName, c.Schema, c.SSLMode,
+		)
+		return postgres.Open(dsn), nil
+	case "mysql":
+		dsn := fmt.Sprintf(
+			"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+			c.User, c.Password, c.Host, c.Port, c.DBName,
+		)
+		return mysql.Open(dsn), nil
 	default:
-		err := fmt.Errorf("cannot init datasource with driver = %s", cfg.Driver)
-		log.Fatal(err)
-		return nil, err
+		return nil, fmt.Errorf("unsupported driver: %s", c.Driver)
 	}
 }
 
-func Open(dialector gorm.Dialector, cfg *Config) (*Database, error) {
-	db, err := gorm.Open(dialector, &gorm.Config{})
+func Open(configs ...*Config) (*Database, error) {
+	cfg := GetConfig(configs...)
+	dialect, err := BuildDSN(cfg)
+	if err != nil {
+		log.Printf("failed to connect database: %v", err)
+		return nil, err
+	}
+	db, err := gorm.Open(dialect, &gorm.Config{})
 	if err != nil {
 		log.Printf("failed to connect database: %v", err)
 		return nil, err

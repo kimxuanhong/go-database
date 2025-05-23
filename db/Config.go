@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -45,11 +44,6 @@ func getEnvAsBool(key string, defaultVal bool) bool {
 		return defaultVal
 	}
 	return val
-}
-
-func (c *Config) GetDSN() string {
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s search_path=%s sslmode=%s",
-		c.Host, c.Port, c.User, c.Password, c.DBName, c.Schema, c.SSLMode)
 }
 
 func getEnv(key, defaultValue string) string {
