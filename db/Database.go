@@ -13,8 +13,8 @@ type Database struct {
 	*gorm.DB
 }
 
-// NewDatabase initializes and returns a new Database instance.
-func NewDatabase(configs ...*Config) (*Database, error) {
+// Connection initializes and returns a new Database instance.
+func Connection(configs ...*Config) (*Database, error) {
 	cfg := GetConfig(configs...)
 	switch cfg.Driver {
 	case "mysql":
