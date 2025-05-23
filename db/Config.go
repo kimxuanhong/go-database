@@ -1,4 +1,4 @@
-package core
+package db
 
 import (
 	"fmt"
@@ -25,8 +25,8 @@ func NewConfig() *Config {
 		Host:     getEnv("DB_HOST", "localhost"),
 		Port:     getEnv("DB_PORT", "5432"),
 		User:     getEnv("DB_USER", "postgres"),
-		Password: getEnv("DB_PASSWORD", "password"),
 		DBName:   getEnv("DB_NAME", "postgres"),
+		Password: getEnv("DB_PASSWORD", "password"),
 		Schema:   getEnv("DB_SCHEMA", "public"),
 		SSLMode:  getEnv("DB_SSL_MODE", "disable"),
 		Debug:    getEnvAsBool("DB_DEBUG_MODE", true),
