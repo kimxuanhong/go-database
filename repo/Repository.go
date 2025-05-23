@@ -25,44 +25,44 @@ func NewRepository[T any, ID comparable](db *db.Database) *Repository[T, ID] {
 }
 
 func (r *Repository[T, ID]) Insert(ctx context.Context, entity *T) error {
-	return r.WithContext(ctx).Create(entity).Error
+	return r.WithContext(ctx).Model(new(T)).Create(entity).Error
 }
 
 func (r *Repository[T, ID]) FindByID(ctx context.Context, id ID) (*T, error) {
-	var entity T
-	err := r.WithContext(ctx).First(&entity, id).Error
-	return &entity, err
+	entity := new(T)
+	err := r.WithContext(ctx).Model(entity).First(entity, "id = ?", id).Error
+	return entity, err
 }
 
 func (r *Repository[T, ID]) Select(ctx context.Context, query interface{}, args ...interface{}) ([]T, error) {
 	var list []T
-	err := r.WithContext(ctx).Where(query, args...).Find(&list).Error
+	err := r.WithContext(ctx).Model(new(T)).Where(query, args...).Find(&list).Error
 	return list, err
 }
 
 func (r *Repository[T, ID]) SelectOne(ctx context.Context, query interface{}, args ...interface{}) (*T, error) {
 	var item T
-	err := r.WithContext(ctx).Where(query, args...).First(&item).Error
+	err := r.WithContext(ctx).Model(new(T)).Where(query, args...).First(&item).Error
 	return &item, err
 }
 
 func (r *Repository[T, ID]) Update(ctx context.Context, entity *T) error {
-	return r.WithContext(ctx).Save(entity).Error
+	return r.WithContext(ctx).Model(new(T)).Save(entity).Error
 }
 
 func (r *Repository[T, ID]) DeleteByID(ctx context.Context, id ID) error {
-	return r.WithContext(ctx).Delete(new(T), id).Error
+	return r.WithContext(ctx).Model(new(T)).Delete(new(T), id).Error
 }
 
 func (r *Repository[T, ID]) ListAll(ctx context.Context) ([]T, error) {
 	var list []T
-	err := r.WithContext(ctx).Find(&list).Error
+	err := r.WithContext(ctx).Model(new(T)).Find(&list).Error
 	return list, err
 }
 
-func (r *Repository[T, ID]) Count() (int64, error) {
+func (r *Repository[T, ID]) Count(ctx context.Context) (int64, error) {
 	var count int64
-	err := r.Model(new(T)).Count(&count).Error
+	err := r.WithContext(ctx).Model(new(T)).Count(&count).Error
 	return count, err
 }
 
