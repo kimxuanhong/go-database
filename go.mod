@@ -5,6 +5,7 @@ go 1.21.0
 toolchain go1.23.8
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/spf13/viper v1.20.1
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/driver/postgres v1.5.11
