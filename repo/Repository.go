@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/kimxuanhong/go-database/db"
-	"gorm.io/gorm"
 	"reflect"
 )
 
@@ -19,11 +18,9 @@ type Repository[T any, ID comparable] struct {
 	*db.Database
 }
 
-func NewRepository[T any, ID comparable](gormDB *gorm.DB) *Repository[T, ID] {
+func NewRepository[T any, ID comparable](db *db.Database) *Repository[T, ID] {
 	return &Repository[T, ID]{
-		Database: &db.Database{
-			DB: gormDB,
-		},
+		Database: db,
 	}
 }
 
