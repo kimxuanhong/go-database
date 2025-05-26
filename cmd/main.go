@@ -13,7 +13,7 @@ import (
 // --- Ví dụ sử dụng:
 
 type UserModel struct {
-	ID        string    `gorm:"column:id;primaryKey;type:uuid"`
+	ID        uuid.UUID `gorm:"primarykey;column:id;type:uuid"`
 	PartnerId string    `gorm:"column:partner_id"`
 	Total     int       `gorm:"column:total"`
 	UserName  string    `gorm:"column:user_name"`
@@ -30,7 +30,7 @@ func (u *UserModel) TableName() string {
 }
 
 func (u *UserModel) BeforeCreate(ctx *gorm.DB) (err error) {
-	u.ID = uuid.NewString()
+	u.ID = uuid.New()
 	u.CreatedAt = time.Now()
 	return
 }
@@ -45,7 +45,7 @@ func (u *UserModel) GetTotal() int {
 }
 
 type UserRepository struct {
-	*repo.Repository[UserModel, string]
+	*repo.Repository[UserModel, uuid.UUID]
 	FindByUserName                     func(ctx context.Context, username string) (*UserModel, error)                                 `repo:"@Query"`
 	FindByUserNameAndEmailOrPartnerId  func(ctx context.Context, username string, email string, partnerId string) (*UserModel, error) `repo:"@Query"`
 	FindAllByEmailOrderByIDDescLimit10 func(ctx context.Context, email string) ([]UserModel, error)                                   `repo:"@Query"`
@@ -66,7 +66,7 @@ func main() {
 		Driver:   "postgres",
 	})
 
-	repository := repo.NewRepository[UserModel, string](datab)
+	repository := repo.NewRepository[UserModel, uuid.UUID](datab)
 	r := &UserRepository{
 		Repository: repository,
 	}
@@ -79,6 +79,8 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
+	user3, err := repository.FindByID(ctx, uuid.MustParse("78c83478-5e15-4720-9acb-b70ab32f011b"))
+	fmt.Println(user3, err)
 	// Bây giờ bạn có thể gọi
 	user, err := r.FindByUserName(ctx, "123")
 	fmt.Println(user, err)

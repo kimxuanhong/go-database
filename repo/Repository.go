@@ -30,17 +30,17 @@ func (r *Repository[T, ID]) Insert(ctx context.Context, entity *T) error {
 
 func (r *Repository[T, ID]) FindByID(ctx context.Context, id ID) (*T, error) {
 	entity := new(T)
-	err := r.WithContext(ctx).Model(entity).First(entity, "id = ?", id).Error
+	err := r.WithContext(ctx).Model(new(T)).First(entity, id).Error
 	return entity, err
 }
 
-func (r *Repository[T, ID]) Select(ctx context.Context, query interface{}, args ...interface{}) ([]T, error) {
+func (r *Repository[T, ID]) Select(ctx context.Context, query any, args ...any) ([]T, error) {
 	var list []T
 	err := r.WithContext(ctx).Model(new(T)).Where(query, args...).Find(&list).Error
 	return list, err
 }
 
-func (r *Repository[T, ID]) SelectOne(ctx context.Context, query interface{}, args ...interface{}) (*T, error) {
+func (r *Repository[T, ID]) SelectOne(ctx context.Context, query any, args ...any) (*T, error) {
 	var item T
 	err := r.WithContext(ctx).Model(new(T)).Where(query, args...).First(&item).Error
 	return &item, err
@@ -66,7 +66,7 @@ func (r *Repository[T, ID]) Count(ctx context.Context) (int64, error) {
 	return count, err
 }
 
-func (r *Repository[T, ID]) CountBy(ctx context.Context, query interface{}, args ...interface{}) (int64, error) {
+func (r *Repository[T, ID]) CountBy(ctx context.Context, query any, args ...any) (int64, error) {
 	var count int64
 	err := r.WithContext(ctx).Model(new(T)).Where(query, args...).Count(&count).Error
 	return count, err
@@ -86,7 +86,7 @@ func (r *Repository[T, ID]) Exists(ctx context.Context, query any, args ...any) 
 	return exists, err
 }
 
-func (r *Repository[T, ID]) QueryPageable(ctx context.Context, page int, pageSize int, query interface{}, args ...interface{}) (*Page[T], error) {
+func (r *Repository[T, ID]) Pageable(ctx context.Context, page int, pageSize int, query any, args ...any) (*Page[T], error) {
 	var items []T
 	var total int64
 
