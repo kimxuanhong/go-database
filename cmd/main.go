@@ -81,6 +81,12 @@ func main() {
 
 	user3, err := repository.FindByID(ctx, uuid.MustParse("78c83478-5e15-4720-9acb-b70ab32f011b"))
 	fmt.Println(user3, err)
+
+	_, err = repository.Exists(ctx, "user_name=?", "123")
+	fmt.Println(err)
+
+	_, err = repository.CountBy(ctx, "user_name=?", "123")
+	fmt.Println(err)
 	// Bây giờ bạn có thể gọi
 	user, err := r.FindByUserName(ctx, "123")
 	fmt.Println(user, err)

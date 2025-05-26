@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/kimxuanhong/go-database/db"
+	"gorm.io/gorm/schema"
 	"reflect"
 )
 
@@ -80,7 +81,7 @@ func (r *Repository[T, ID]) RawQuery(ctx context.Context, query string, args ...
 
 func (r *Repository[T, ID]) Exists(ctx context.Context, query any, args ...any) (bool, error) {
 	var exists bool
-	tableName := r.NamingStrategy.TableName(reflect.TypeOf(new(T)).Elem().Name())
+	tableName := r.tableName()
 	rawQuery := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE %s)", tableName, query)
 	err := r.WithContext(ctx).Raw(rawQuery, args...).Scan(&exists).Error
 	return exists, err
@@ -107,4 +108,12 @@ func (r *Repository[T, ID]) Pageable(ctx context.Context, page int, pageSize int
 		Page:       page,
 		PageSize:   pageSize,
 	}, nil
+}
+
+func (r *Repository[T, ID]) tableName() string {
+	entity := new(T)
+	if tn, ok := any(entity).(schema.Tabler); ok {
+		return tn.TableName()
+	}
+	return r.NamingStrategy.TableName(reflect.TypeOf(*entity).Name())
 }
