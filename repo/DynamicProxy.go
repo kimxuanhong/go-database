@@ -172,12 +172,17 @@ func (r *Repository[T, ID]) FillFuncFields(repo interface{}) error {
 				if isFindAll {
 					var res []T
 					err := buildGormQuery(dbWithCtx, qp, params).Find(&res).Error
+					if err != nil {
+						results = []reflect.Value{
+							reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf((*T)(nil)).Elem()), 0, 0),
+							reflect.ValueOf(err),
+						}
+						return results
+					}
+
 					results = []reflect.Value{
 						reflect.ValueOf(res),
-						reflect.Zero(reflect.TypeOf((*error)(nil)).Elem()),
-					}
-					if err != nil {
-						results[1] = reflect.ValueOf(err)
+						reflect.Zero(reflect.TypeOf((*error)(nil)).Elem()), // nil
 					}
 				} else {
 					var res T
