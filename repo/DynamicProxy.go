@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -183,19 +182,17 @@ func (r *Repository[T, ID]) FillFuncFields(repo interface{}) error {
 				} else {
 					var res T
 					err := buildGormQuery(dbWithCtx, qp, params).First(&res).Error
-					if errors.Is(err, gorm.ErrRecordNotFound) {
+					if err != nil {
 						results = []reflect.Value{
-							reflect.Zero(reflect.TypeOf(new(T))),
-							reflect.Zero(reflect.TypeOf((*error)(nil)).Elem()),
+							reflect.Zero(reflect.TypeOf(&res)),
+							reflect.ValueOf(err),
 						}
 						return results
 					}
+
 					results = []reflect.Value{
 						reflect.ValueOf(&res),
 						reflect.Zero(reflect.TypeOf((*error)(nil)).Elem()),
-					}
-					if err != nil {
-						results[1] = reflect.ValueOf(err)
 					}
 				}
 
